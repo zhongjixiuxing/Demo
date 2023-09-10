@@ -1,0 +1,8 @@
+{
+  "name": "demo",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite",
+  "id": "dc00214a"
+}
