@@ -1,8 +1,6 @@
 <template>
   <ion-app>
     <ion-router-outlet />
-
-    <span>{{text}}</span>
   </ion-app>
 </template>
 
