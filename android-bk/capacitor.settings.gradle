@@ -11,14 +11,5 @@ project(':capacitor-haptics').projectDir = new File('../node_modules/@capacitor/
 include ':capacitor-keyboard'
 project(':capacitor-keyboard').projectDir = new File('../node_modules/@capacitor/keyboard/android')
 
-include ':capacitor-preferences'
-project(':capacitor-preferences').projectDir = new File('../node_modules/@capacitor/preferences/android')
-
 include ':capacitor-status-bar'
 project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacitor/status-bar/android')
-
-include ':miaz-capacitor-websocket'
-project(':miaz-capacitor-websocket').projectDir = new File('../node_modules/@miaz/capacitor-websocket/android')
-
-include ':wahr-capacitor-websocket-client'
-project(':wahr-capacitor-websocket-client').projectDir = new File('../node_modules/@wahr/capacitor-websocket-client/android')
