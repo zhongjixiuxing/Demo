@@ -48,7 +48,7 @@ export class DouYinWS {
         return strArr.join('');
       }
       
-      const data = new Uint8Array(buffer);
+      const data = new Uint8Array(buffer as any);
       const message: any = this.protobufClasses.PushFrame.decode(data);
       const respBody: any = this.protobufClasses.Response.decode(pako.inflate(message.payload))
       if (respBody.needAck) {

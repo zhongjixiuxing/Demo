@@ -169,7 +169,7 @@ async function stopListen() {
   }
 }
 
-function changeDouyinLiveUrl(event) {
+function changeDouyinLiveUrl(event: any) {
   douyinLiveUrl.value = event.target.value
 }
 
