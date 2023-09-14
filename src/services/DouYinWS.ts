@@ -105,11 +105,6 @@ export class DouYinWS {
       }
     })
 
-    // setTimeout(() => {
-    //   console.log('close --------- : ')
-    //   alert('colse')
-    //   this.wsClient.close()
-    // }, 60000)
   }
 
   async startIsomorphic() {
@@ -856,6 +851,11 @@ export class DouYinWS {
     const data = new Uint8Array(await buffer.arrayBuffer());
     const message: any = this.protobufClasses.PushFrame.decode(data);
     const respBody: any = this.protobufClasses.Response.decode(pako.inflate(message.payload))
+
+    if (respBody.needAck) {
+      // TODO sendAck
+      await this.sendAck(message.logId, respBody.internalExt)
+    }
 
     const msgs = []
     for (const msg of respBody.messagesList) {
