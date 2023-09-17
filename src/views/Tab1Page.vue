@@ -73,6 +73,7 @@
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonChip, IonItem, IonLabel, IonList, IonAvatar, IonText, IonButton } from '@ionic/vue';
 import { ref } from 'vue'
 import { DouYinWS } from '../services/DouYinWS'
+import { CapacitorHttp } from '@capacitor/core';
 
 const url = 'https://live.douyin.com/794197581224'
 
@@ -135,6 +136,23 @@ let msgs = ref<any[]>([
 // }
 ])
 
+async function sendToRemoteServer(content: string)  {
+  const options = {
+    url: 'https://api.chatbot.anxing131.xyz/openai/douyin/live',
+    // url: 'https://anxing.requestcatcher.com/',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: {
+       "body": {
+        "mode": "store",
+        "content": content
+    }},
+  };
+
+  const response = await CapacitorHttp.post(options);
+}
+
 async function startListen() {
   if (!douyinLiveUrl.value.trim()) {
     alert('请输入Web抖音地址')
@@ -152,6 +170,7 @@ async function startListen() {
           continue
         }
 
+        sendToRemoteServer(msg.content)
         msgs.value.push(msg)
       }
     },
