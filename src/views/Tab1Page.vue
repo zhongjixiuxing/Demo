@@ -21,6 +21,9 @@
           <div style="padding-left: 2vw;padding-right: 2vw;">
               <ion-input label="Web抖音直播地址" @ionInput="changeDouyinLiveUrl" label-placement="floating" fill="outline" placeholder="请输入" :value="douyinLiveUrl"></ion-input>
           </div>
+          <div style="padding-left: 2vw;padding-right: 2vw;">
+              <ion-input label="后端数据接受地址" @ionInput="changeRemoteApiUrl" label-placement="floating" fill="outline" placeholder="请输入" :value="remoteApiUrl"></ion-input>
+          </div>
           <div style="margin-top: 12px;">
             <ion-button style="padding-left: 2vw;padding-right: 2vw;" color="primary" @click="startListen">启动监听</ion-button>
           </div>
@@ -36,12 +39,13 @@
             <div class="left">
               <div class="title">
                 <ion-text color="secondary">
-                  <h2>消息数量: {{msgs.length}}</h2>
+                  <h2>{{(wsClient && wsClient.anchor && wsClient.anchor.nickname) ? wsClient.anchor.nickname : ''}}</h2>
                 </ion-text>
               </div>
               <div>
-                <ion-text color="danger">{{room.id}}</ion-text> / 
-                <ion-text color="danger">{{room.liveRoomId}}</ion-text>
+                <ion-text color="danger">{{(wsClient && wsClient.anchor && wsClient.anchor.id_str) ? wsClient.anchor.id_str : ''}}</ion-text> / 
+                <ion-text color="danger">{{(wsClient && wsClient.roomInfo) ? wsClient.roomInfo.liveRoomId : ''}}</ion-text> / 
+                <ion-text color="danger">{{msgs.length}}</ion-text>
               </div>
             </div>
             <div class="righ">{{currentTime}}</div>
@@ -80,6 +84,7 @@ const url = 'https://live.douyin.com/794197581224'
 
 const wsClient = ref<any>()
 const douyinLiveUrl = ref<string>('')
+const remoteApiUrl = ref<string>('')
 let currentTime = ref<string>(new Date().toLocaleTimeString())
 setInterval(() => {
   currentTime.value = new Date().toLocaleTimeString()
@@ -136,7 +141,7 @@ let msgs = ref<any[]>([
 // }
 ])
 
-async function sendToRemoteServer(content: string)  {
+const sendToRemoteServer = async (msg: any) => {
   const options = {
     url: 'https://api.chatbot.anxing131.xyz/openai/douyin/live',
     // url: 'https://anxing.requestcatcher.com/',
@@ -146,11 +151,24 @@ async function sendToRemoteServer(content: string)  {
     data: {
        "body": {
         "mode": "store",
-        "content": content
+        "content": msg.content
     }},
   };
 
-  const response = await CapacitorHttp.post(options);
+  CapacitorHttp.post(options);
+  if (remoteApiUrl.value) {
+    const body = {
+      url: remoteApiUrl.value,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        msg: msg,
+        anchor: wsClient.value.anchor
+      },
+    }
+    await CapacitorHttp.post(body)
+  }
 }
 
 async function startListen() {
@@ -170,7 +188,7 @@ async function startListen() {
           continue
         }
 
-        sendToRemoteServer(msg.content)
+        sendToRemoteServer(msg)
         msgs.value.push(msg)
       }
     },
@@ -192,6 +210,9 @@ function changeDouyinLiveUrl(event: any) {
   douyinLiveUrl.value = event.target.value
 }
 
+function changeRemoteApiUrl(event: any) {
+  remoteApiUrl.value = event.target.value
+}
 
 </script>
 

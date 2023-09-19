@@ -10,6 +10,7 @@ export class DouYinWS {
   wsClient: any
   roomInfo: any = {}
   protobufClasses: any = {}
+  anchor: any = {}
   constructor (options: any) {
     this.options = options
     this.initProtobuf()
@@ -150,9 +151,18 @@ export class DouYinWS {
       },
     });
 
+    // this.sendToRemoteServer(response.data)
     const cookie = response.headers['Set-Cookie'].substring(0, response.headers['Set-Cookie'].indexOf(';'))
 
     let temp = response.data.match(/roomId\\":\\"(\d+)\\"/g)
+    let temp2 = response.data.match(/\\"anchor\\":(\S*)\\"follow_info\\"/g)
+    temp2 = temp2[0].replace(/,\\"follow_info\\"/, "")
+    temp2 = temp2.replace(/\\"anchor\\":/, "")
+    temp2 = `${temp2}}`
+    // 主播信息
+    this.anchor = JSON.parse(temp2.replace(/\\"/g, '"'))
+
+    // "anchor":{"id_str":"74810581616","sec_uid":"MS4wLjABAAAAXcusadpsns9kBnsCcbvD8-Xuv2pFqH4X2rs-P2fnw7U","nickname":"旭旭宝宝","avatar_thumb"
     if (!temp.length) {
       alert('请检查输入, 没匹配到LiveRoomId: ' + temp)
       return
@@ -175,6 +185,23 @@ export class DouYinWS {
 
     this.roomInfo.liveRoomId = liveRoomId
     return { cookie, liveRoomId }
+  }
+
+  async sendToRemoteServer(content: string)  {
+    const options = {
+      url: 'https://anxing.requestcatcher.com/',
+      // url: 'https://anxing.requestcatcher.com/',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+         "body": {
+          "mode": "store",
+          "content": content
+      }},
+    };
+  
+    const response = await CapacitorHttp.post(options);
   }
 
   async sendAck(logId: any, internalExt: any) {
